@@ -12,7 +12,8 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { login, signout, getCartItems, signup as _signup } from "../../actions";
 import Cart from "../UI/Cart";
-
+import { GoogleLogin } from "react-google-login";
+import axios from "axios";
 /**
  * @author
  * @function Header
@@ -140,6 +141,20 @@ const Header = (props) => {
     );
   };
 
+  const responseSuccessGoogle = (response) => {
+    console.log(response);
+    axios({
+      method: "POST",
+      url: "http://localhost:2000/api/googlelogin",
+      data: { tokenId: response.tokenId },
+    }).then((response) => {
+      console.log("Google login success", response);
+    });
+  };
+  const responseErrorGoogle = (response) => {
+    console.log(response);
+  };
+
   return (
     <div className="header">
       <Modal visible={loginModal} onClose={() => setLoginModal(false)}>
@@ -199,6 +214,17 @@ const Header = (props) => {
                     margin: "20px 0",
                   }}
                 />
+
+                <div>Or Login With</div>
+                <div className="social">
+                  <GoogleLogin
+                    clientId="143478304318-nricvltt50mgn1vfqo26sbqc4hvkvi7m.apps.googleusercontent.com"
+                    buttonText="Login with google"
+                    onSuccess={responseSuccessGoogle}
+                    onFailure={responseErrorGoogle}
+                    cookiePolicy={"single_host_origin"}
+                  />
+                </div>
               </div>
             </div>
           </div>

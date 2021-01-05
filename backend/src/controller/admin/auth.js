@@ -6,7 +6,7 @@ const shortid = require("shortid");
 exports.signup = (req, res) => {
   User.findOne({ email: req.body.email }).exec(async (error, user) => {
     if (user)
-      return res.status(400).json({
+      return res.status(500).json({
         message: "Admin already registered",
       });
 
@@ -23,7 +23,7 @@ exports.signup = (req, res) => {
 
     _user.save((error, data) => {
       if (error) {
-        return res.status(400).json({
+        return res.status(500).json({
           message: "Something went wrong",
         });
       }
@@ -39,28 +39,28 @@ exports.signup = (req, res) => {
 
 exports.signin = (req, res) => {
   User.findOne({ email: req.body.email }).exec(async (error, user) => {
-    if (error) return res.status(400).json({ error });
+    if (error) return res.status(500).json({ error });
     if (user) {
       const isPassword = await user.authenticate(req.body.password);
       if (isPassword && user.role === "admin") {
         const token = jwt.sign(
           { _id: user._id, role: user.role },
           process.env.JWT_SECRET,
-          { expiresIn: "1d" }
+          { expiresIn: "5m" }
         );
         const { _id, firstName, lastName, email, role, fullName } = user;
-        res.cookie("token", token, { expiresIn: "1d" });
+        res.cookie("token", token, { expiresIn: "5m" });
         res.status(200).json({
           token,
           user: { _id, firstName, lastName, email, role, fullName },
         });
       } else {
-        return res.status(400).json({
+        return res.status(500).json({
           message: "Invalid Password",
         });
       }
     } else {
-      return res.status(400).json({ message: "Something went wrong" });
+      return res.status(500).json({ message: "Something went wrong" });
     }
   });
 };

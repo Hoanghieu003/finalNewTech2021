@@ -1,10 +1,15 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Layout from "../../components/Layout";
 import { Container, Row, Col, Table } from "react-bootstrap";
 import Input from "../../components/UI/Input";
 import Modal from "../../components/UI/Modal";
 import { useSelector, useDispatch } from "react-redux";
-import { addProduct, deleteProductById } from "../../actions";
+import {
+  addProduct,
+  deleteProductById,
+  getInitialData,
+  isUserLoggedIn,
+} from "../../actions";
 import { generatePublicUrl } from "../../urlConfig";
 import "./style.css";
 
@@ -26,7 +31,16 @@ const Products = (props) => {
   const category = useSelector((state) => state.category);
   const product = useSelector((state) => state.product);
   const dispatch = useDispatch();
+  const auth = useSelector((state) => state.auth);
 
+  useEffect(() => {
+    if (!auth.authenticate) {
+      dispatch(isUserLoggedIn());
+    }
+    if (auth.authenticate) {
+      dispatch(getInitialData());
+    }
+  }, [auth.authenticate]);
   const handleClose = () => {
     setShow(false);
   };

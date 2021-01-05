@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { updateOrder } from "../../actions";
+import { getInitialData, isUserLoggedIn, updateOrder } from "../../actions";
 import Layout from "../../components/Layout";
 import Card from "../../components/UI/Card";
 
@@ -15,7 +15,16 @@ const Orders = (props) => {
   const order = useSelector((state) => state.order);
   const [type, setType] = useState("");
   const dispatch = useDispatch();
+  const auth = useSelector((state) => state.auth);
 
+  useEffect(() => {
+    if (!auth.authenticate) {
+      dispatch(isUserLoggedIn());
+    }
+    if (auth.authenticate) {
+      dispatch(getInitialData());
+    }
+  }, [auth.authenticate]);
   const onOrderUpdate = (orderId) => {
     const payload = {
       orderId,
